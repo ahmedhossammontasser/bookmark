@@ -1,9 +1,11 @@
 class BokmarksController < ApplicationController
   before_action :set_bokmark, only: %i[ show update destroy ]
+  before_action :authenticate_user!
+  load_and_authorize_resource
 
   # GET /bokmarks
   def index
-    @bokmarks = Bokmark.all
+    @bokmarks = current_user.bokmarks
 
     render json: @bokmarks
   end
