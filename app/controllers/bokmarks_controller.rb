@@ -22,7 +22,7 @@ class BokmarksController < ApplicationController
   def create
     ActiveRecord::Base.transaction do  
       begin
-        @bokmark = BokmarkService.new_bokmark( bokmark_params, params[:parent_id] , @current_user)
+        @bokmark = BokmarkService.new(bokmark_params,  params[:parent_id] , @current_user).get_bokmark_obj( )
         if @bokmark.save
           render json: @bokmark, status: :created, location: @bokmark
         else

@@ -1,25 +1,31 @@
 
 class BokmarkService
-    
-    def self.new_bokmark(bokmark_params, parent_id, current_user)
-        bokmark = Bokmark.new(bokmark_params)
-        site_obj_id = nil
-        if bokmark.bookmark_type == "file"
-            site_obj = SiteService.get_create_site(bokmark.url_text)
-            bokmark.site = site_obj            
+    def initialize(bokmark_params, parent_id, current_user)
+        @bokmark = Bokmark.new(bokmark_params)
+        @bokmark.parent_id = parent_id
+        @bokmark.user_id = current_user.id            
+        if @bokmark.bookmark_type == "file"
+            @bokmark.site = SiteService.new(@bokmark.url_text).get_create_site()
         end
-        if parent_id.nil?
+    end
+
+    def verify()
+        if @bokmark.parent_id.nil?
             raise Exception.new "Parent Id can not be nil"
         else
-            bokmark.parent_id = parent_id
-            if bokmark.parent.user != current_user
+            if @bokmark.parent.user != @bokmark.user
                 raise Exception.new "Parent Bookmark does not belong to same user"
             end
-            if bokmark.parent.bookmark_type == "file"
+            if @bokmark.parent.bookmark_type == "file"
                 raise Exception.new "Parent Bookmark can't be file type"
             end
         end
-        bokmark.user_id = current_user.id
-        return bokmark
+        return true
+    end
+
+    def get_bokmark_obj( )
+        if self.verify()
+            return @bokmark
+        end 
     end 
 end
