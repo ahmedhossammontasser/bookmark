@@ -11,4 +11,5 @@
 class Tag < ApplicationRecord
     validates_uniqueness_of :title
     validates_presence_of :title    
+	has_and_belongs_to_many :bokmarks
 end

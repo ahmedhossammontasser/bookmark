@@ -1,8 +1,7 @@
 
 class BokmarkService
-    def initialize(bokmark_params, parent_id, current_user)
+    def initialize(bokmark_params, current_user)
         @bokmark = Bokmark.new(bokmark_params)
-        @bokmark.parent_id = parent_id
         @bokmark.user_id = current_user.id            
         if @bokmark.bookmark_type == "file"
             @bokmark.site = SiteService.new(@bokmark.url_text).get_create_site()

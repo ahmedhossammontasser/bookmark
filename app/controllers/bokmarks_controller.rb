@@ -22,7 +22,7 @@ class BokmarksController < ApplicationController
   def create
     ActiveRecord::Base.transaction do  
       begin
-        @bokmark = BokmarkService.new(bokmark_params,  params[:parent_id] , @current_user).get_bokmark_obj( )
+        @bokmark = BokmarkService.new(bokmark_params , @current_user).get_bokmark_obj( )
         if @bokmark.save
           render json: @bokmark, status: :created, location: @bokmark
         else
@@ -56,6 +56,6 @@ end
 
     # Only allow a list of trusted parameters through.
     def bokmark_params
-      params.require(:bokmark).permit(:title, :user_id, :url_text, :bookmark_type, :parent_id, :ancestry, :site_id, :shorten_url)
+      params.require(:bokmark).permit(:title, :user_id, :url_text, :bookmark_type, :parent_id, :ancestry, :site_id, :shorten_url, tag_ids:[]  )
     end
 end

@@ -19,6 +19,10 @@ class Bokmark < ApplicationRecord
 	has_ancestry
 	belongs_to :user
 	belongs_to :site , optional: true
+    validates_presence_of :title
 	enum bookmark_type: {file:"file" , folder:"folder"}
 	
+	has_and_belongs_to_many :tags
+	accepts_nested_attributes_for :tags
+
 end
