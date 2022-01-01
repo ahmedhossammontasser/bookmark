@@ -17,6 +17,7 @@ gem 'jwt'
 gem 'ancestry'
 gem 'annotate'
 gem 'cancancan'
+gem 'bitly'
 
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 # gem "jbuilder"

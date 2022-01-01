@@ -1,11 +1,10 @@
-
 class SiteService
     def initialize(site_url)
         @site_url = site_url
         @uri = URI.parse(site_url)
     end
     
-    def self.working_url?()
+    def working_url?()
         if  @uri.is_a?(URI::HTTP) && !@uri.host.nil?
             return true
         end

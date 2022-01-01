@@ -6,6 +6,7 @@ class BokmarkService
         @bokmark.user_id = current_user.id            
         if @bokmark.bookmark_type == "file"
             @bokmark.site = SiteService.new(@bokmark.url_text).get_create_site()
+            @bokmark.shorten_url = BitlyShortenService.new().get_shorten_lnk(@bokmark.url_text)
         end
     end
 

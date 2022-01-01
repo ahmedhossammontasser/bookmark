@@ -12,6 +12,7 @@
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
 #  ancestry      :string
+#  shorten_url   :text
 #
 
 class Bokmark < ApplicationRecord

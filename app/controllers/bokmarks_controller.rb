@@ -56,6 +56,6 @@ end
 
     # Only allow a list of trusted parameters through.
     def bokmark_params
-      params.require(:bokmark).permit(:title, :user_id, :url_text, :bookmark_type, :parent_id, :ancestry, :site_id)
+      params.require(:bokmark).permit(:title, :user_id, :url_text, :bookmark_type, :parent_id, :ancestry, :site_id, :shorten_url)
     end
 end
