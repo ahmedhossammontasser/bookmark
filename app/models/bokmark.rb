@@ -15,9 +15,9 @@
 #
 
 class Bokmark < ApplicationRecord
-  has_ancestry
-  belongs_to :user
-  belongs_to :site , optional: true
-  enum bookmark_type: [:file , :folder]
-
+	has_ancestry
+	belongs_to :user
+	belongs_to :site , optional: true
+	enum bookmark_type: {file:"file" , folder:"folder"}
+	
 end

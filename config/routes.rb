@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  resources :tags, :except => [:destroy]
+  resources :tags, :except => [:destroy, :update]
   resources :bokmarks
   devise_for :users,
   controllers: {

@@ -5,8 +5,8 @@ class BokmarksController < ApplicationController
 
   # GET /bokmarks
   def index
+    # @bokmarks = current_user.bokmarks.find_by(ancestry:nil).subtree
     @bokmarks = current_user.bokmarks
-
     render json: @bokmarks
   end
 
@@ -16,15 +16,23 @@ class BokmarksController < ApplicationController
   end
 
   # POST /bokmarks
+  '''
+    create bokmark with user_id && and use url_text to link/create site object 
+  '''
   def create
-    @bokmark = Bokmark.new(bokmark_params)
-
-    if @bokmark.save
-      render json: @bokmark, status: :created, location: @bokmark
-    else
-      render json: @bokmark.errors, status: :unprocessable_entity
+    ActiveRecord::Base.transaction do  
+      begin
+        @bokmark = BokmarkService.new_bokmark( bokmark_params, params[:parent_id] , @current_user)
+        if @bokmark.save
+          render json: @bokmark, status: :created, location: @bokmark
+        else
+          render json: @bokmark.errors, status: :unprocessable_entity
+        end
+    rescue Exception => error
+      render json: {"error": error }, status: :unprocessable_entity
     end
   end
+end
 
   # PATCH/PUT /bokmarks/1
   def update
@@ -48,6 +56,6 @@ class BokmarksController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def bokmark_params
-      params.require(:bokmark).permit(:title, :user_id, :url_text, :photo_url)
+      params.require(:bokmark).permit(:title, :user_id, :url_text, :bookmark_type, :parent_id, :ancestry, :site_id)
     end
 end
