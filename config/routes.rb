@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :sites, :only => [:index, :show]
   resources :tags, :except => [:destroy, :update]
   resources :bokmarks
   devise_for :users,

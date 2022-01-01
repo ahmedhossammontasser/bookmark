@@ -16,6 +16,12 @@ class Ability
     return unless user.present?  # additional permissions for logged in users (they can read their own posts)
     can :manage, Bokmark, user: user
 
+    return unless user.present?  # additional permissions for logged in users (they can read their own posts)
+    # can :manage, Site, user: user
+    can :manage, Site do |site|
+      user.sites.uniq.include?(site)
+    end
+
     # The first argument to `can` is the action you are giving the user
     # permission to do.
     # If you pass :manage it will apply to every action. Other common actions
