@@ -13,11 +13,13 @@ class Ability
     #     can :read, :all
     #   end
     #
+    '''
+      User can only access his own bokmark and own sites  
+    ''' 
     return unless user.present?  # additional permissions for logged in users (they can read their own posts)
     can :manage, Bokmark, user: user
 
     return unless user.present?  # additional permissions for logged in users (they can read their own posts)
-    # can :manage, Site, user: user
     can :manage, Site do |site|
       user.sites.uniq.include?(site)
     end

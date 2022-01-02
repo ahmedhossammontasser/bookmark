@@ -4,6 +4,9 @@ class BokmarksController < ApplicationController
   load_and_authorize_resource
 
   # GET /bokmarks
+  '''
+    return list of only current_user bokmarks
+  '''
   def index
     # @bokmarks = current_user.bokmarks.find_by(ancestry:nil).subtree
     @bokmarks = current_user.bokmarks
