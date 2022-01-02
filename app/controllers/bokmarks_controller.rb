@@ -1,5 +1,5 @@
 class BokmarksController < ApplicationController
-  before_action :set_bokmark, only: %i[ show update destroy ]
+  before_action :set_bokmark, only: %i[ show destroy ]
   before_action :authenticate_user!
   load_and_authorize_resource
 
@@ -38,13 +38,13 @@ class BokmarksController < ApplicationController
 end
 
   # PATCH/PUT /bokmarks/1
-  def update
-    if @bokmark.update(bokmark_params)
-      render json: @bokmark
-    else
-      render json: @bokmark.errors, status: :unprocessable_entity
-    end
-  end
+  # def update
+  #   if @bokmark.update(bokmark_params)
+  #     render json: @bokmark
+  #   else
+  #     render json: @bokmark.errors, status: :unprocessable_entity
+  #   end
+  # end
 
   # DELETE /bokmarks/1
   def destroy

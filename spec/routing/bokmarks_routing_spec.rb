@@ -15,13 +15,13 @@ RSpec.describe BokmarksController, type: :routing do
       expect(post: "/bokmarks").to route_to("bokmarks#create")
     end
 
-    it "routes to #update via PUT" do
-      expect(put: "/bokmarks/1").to route_to("bokmarks#update", id: "1")
-    end
+    # it "routes to #update via PUT" do
+    #   expect(put: "/bokmarks/1").to route_to("bokmarks#update", id: "1")
+    # end
 
-    it "routes to #update via PATCH" do
-      expect(patch: "/bokmarks/1").to route_to("bokmarks#update", id: "1")
-    end
+    # it "routes to #update via PATCH" do
+    #   expect(patch: "/bokmarks/1").to route_to("bokmarks#update", id: "1")
+    # end
 
     it "routes to #destroy" do
       expect(delete: "/bokmarks/1").to route_to("bokmarks#destroy", id: "1")

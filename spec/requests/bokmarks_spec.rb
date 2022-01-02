@@ -16,12 +16,38 @@ RSpec.describe "/bokmarks", type: :request do
   # This should return the minimal set of attributes required to create a valid
   # Bokmark. As you add validations to Bokmark, be sure to
   # adjust the attributes here as well.
+  fixtures :users
+  fixtures :bokmarks
   let(:valid_attributes) {
-    skip("Add a hash of attributes valid for your model")
+    {
+        "title": "ahmed hossam",
+        "url_text": "https://www.facebook.com/ahmedhossammontassera/",
+        "bookmark_type": "file",
+        "parent_id":   bokmarks[0].id , 
+        "tag_ids": [],
+        "user_id": users[0].id
+    }
+  }
+  let(:valid_attributes_2) {
+    {
+        "title": "ahmed hossam",
+        "url_text": "https://www.facebook.com/ahmed_hossam_montassera/",
+        "bookmark_type": "file",
+        "parent_id":   bokmarks[0].id , 
+        "tag_ids": [],
+        "user_id": users[0].id
+    }
   }
 
   let(:invalid_attributes) {
-    skip("Add a hash of attributes invalid for your model")
+    {
+        "title": "ahmed hossam",
+        "url_text": "httpswwwfacebookcomahmed_hossam_montassera",
+        "bookmark_type": "file",
+        "parent_id":   bokmarks[0].id , 
+        "tag_ids": [],
+        "user_id": users[0].id
+    }
   }
 
   # This should return the minimal set of values that should be in the headers
@@ -31,11 +57,18 @@ RSpec.describe "/bokmarks", type: :request do
   let(:valid_headers) {
     {}
   }
+  
+  def authenticated_header(user_id)
+		secret_key_base = ENV.fetch("SECRET_KEY_BASE") || Rails.application.secrets.secret_key_base
+		token = JWT.encode({id: user_id, exp: 60.days.from_now.to_i}, secret_key_base)
+    # token = Knock::AuthToken.new(payload: { sub: user.id }).token
+    { 'Authorization': "token #{token}" }
+  end
 
   describe "GET /index" do
     it "renders a successful response" do
       Bokmark.create! valid_attributes
-      get bokmarks_url, headers: valid_headers, as: :json
+      get bokmarks_url, headers: authenticated_header(users[0].id), as: :json
       expect(response).to be_successful
     end
   end
@@ -43,7 +76,7 @@ RSpec.describe "/bokmarks", type: :request do
   describe "GET /show" do
     it "renders a successful response" do
       bokmark = Bokmark.create! valid_attributes
-      get bokmark_url(bokmark), as: :json
+      get bokmark_url(bokmark), headers: authenticated_header(users[0].id), as: :json
       expect(response).to be_successful
     end
   end
@@ -53,15 +86,33 @@ RSpec.describe "/bokmarks", type: :request do
       it "creates a new Bokmark" do
         expect {
           post bokmarks_url,
-               params: { bokmark: valid_attributes }, headers: valid_headers, as: :json
+               params: { bokmark: valid_attributes }, headers: authenticated_header(users[0].id), as: :json
         }.to change(Bokmark, :count).by(1)
+        .and change(Site, :count).by(1)
       end
 
+      it "creates 2 new Bokmark with same site" do
+        expect {
+          post bokmarks_url,
+               params: { bokmark: valid_attributes }, headers: authenticated_header(users[0].id), as: :json
+          
+          post bokmarks_url,
+               params: { bokmark: valid_attributes }, headers: authenticated_header(users[0].id), as: :json
+        }.to change(Bokmark, :count).by(2)
+        .and change(Site, :count).by(1)
+      end
+    end
+
+    context "with valid parameters 2" do
       it "renders a JSON response with the new bokmark" do
         post bokmarks_url,
-             params: { bokmark: valid_attributes }, headers: valid_headers, as: :json
+             params: { bokmark: valid_attributes }, headers: authenticated_header(users[0].id), as: :json
         expect(response).to have_http_status(:created)
         expect(response.content_type).to match(a_string_including("application/json"))
+        response_body = JSON.parse(response.body)
+        response_body["site_id"].should be_kind_of Integer
+        response_body["ancestry"].should_not be_empty
+        response_body["shorten_url"].should be_kind_of String
       end
     end
 
@@ -75,52 +126,52 @@ RSpec.describe "/bokmarks", type: :request do
 
       it "renders a JSON response with errors for the new bokmark" do
         post bokmarks_url,
-             params: { bokmark: invalid_attributes }, headers: valid_headers, as: :json
+             params: { bokmark: invalid_attributes }, headers: authenticated_header(users[0].id), as: :json
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(response.content_type).to eq("application/json")
+        expect(response.content_type).to eq("application/json; charset=utf-8")
       end
     end
   end
 
-  describe "PATCH /update" do
-    context "with valid parameters" do
-      let(:new_attributes) {
-        skip("Add a hash of attributes valid for your model")
-      }
+  # describe "PATCH /update" do
+  #   context "with valid parameters" do
+  #     let(:new_attributes) {
+  #       skip("Add a hash of attributes valid for your model")
+  #     }
 
-      it "updates the requested bokmark" do
-        bokmark = Bokmark.create! valid_attributes
-        patch bokmark_url(bokmark),
-              params: { bokmark: new_attributes }, headers: valid_headers, as: :json
-        bokmark.reload
-        skip("Add assertions for updated state")
-      end
+  #     it "updates the requested bokmark" do
+  #       bokmark = Bokmark.create! valid_attributes
+  #       patch bokmark_url(bokmark),
+  #             params: { bokmark: new_attributes }, headers: authenticated_header(users[0].id), as: :json
+  #       bokmark.reload
+  #       skip("Add assertions for updated state")
+  #     end
 
-      it "renders a JSON response with the bokmark" do
-        bokmark = Bokmark.create! valid_attributes
-        patch bokmark_url(bokmark),
-              params: { bokmark: new_attributes }, headers: valid_headers, as: :json
-        expect(response).to have_http_status(:ok)
-        expect(response.content_type).to match(a_string_including("application/json"))
-      end
-    end
+  #     it "renders a JSON response with the bokmark" do
+  #       bokmark = Bokmark.create! valid_attributes
+  #       patch bokmark_url(bokmark),
+  #             params: { bokmark: new_attributes }, headers: authenticated_header(users[0].id), as: :json
+  #       expect(response).to have_http_status(:ok)
+  #       expect(response.content_type).to match(a_string_including("application/json"))
+  #     end
+    # end
 
-    context "with invalid parameters" do
-      it "renders a JSON response with errors for the bokmark" do
-        bokmark = Bokmark.create! valid_attributes
-        patch bokmark_url(bokmark),
-              params: { bokmark: invalid_attributes }, headers: valid_headers, as: :json
-        expect(response).to have_http_status(:unprocessable_entity)
-        expect(response.content_type).to eq("application/json")
-      end
-    end
-  end
+  #   context "with invalid parameters" do
+  #     it "renders a JSON response with errors for the bokmark" do
+  #       bokmark = Bokmark.create! valid_attributes
+  #       patch bokmark_url(bokmark),
+  #             params: { bokmark: invalid_attributes }, headers: authenticated_header(users[0].id), as: :json
+  #       expect(response).to have_http_status(:unprocessable_entity)
+  #       expect(response.content_type).to eq("application/json")
+  #     end
+  #   end
+  # end
 
   describe "DELETE /destroy" do
     it "destroys the requested bokmark" do
       bokmark = Bokmark.create! valid_attributes
       expect {
-        delete bokmark_url(bokmark), headers: valid_headers, as: :json
+        delete bokmark_url(bokmark), headers: authenticated_header(users[0].id), as: :json
       }.to change(Bokmark, :count).by(-1)
     end
   end

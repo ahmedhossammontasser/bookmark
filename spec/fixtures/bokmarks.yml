@@ -1,0 +1,11 @@
+bokmark_root_user_a:
+  bookmark_type: "folder"
+  id: 1
+  title: "root for user a"
+  user_id: 1
+  site_id: nil
+  url_text: nil
+  photo_url: nil
+  bookmark_type: nil
+  ancestry: nil 
+  shorten_url: nil
