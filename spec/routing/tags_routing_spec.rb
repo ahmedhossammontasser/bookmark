@@ -15,13 +15,15 @@ RSpec.describe TagsController, type: :routing do
       expect(post: "/tags").to route_to("tags#create")
     end
 
-    it "routes to #update via PUT" do
-      expect(put: "/tags/1").to route_to("tags#update", id: "1")
-    end
+    # it "routes to #update via PUT" do
+      # expect(put: "/tags/1").to route_to("tags#update", id: "1")
+      # expect (put: "/tags/1").to raise_exception
+      # expect (put: "/tags/1").to raise_exception ("No route matches '/tags/1'")
+    # end
 
-    it "routes to #update via PATCH" do
-      expect(patch: "/tags/1").to route_to("tags#update", id: "1")
-    end
+    # it "routes to #update via PATCH" do
+      # expect(patch: "/tags/1").to route_to("tags#update", id: "1")
+    # end
 
     # it "routes to #destroy" do
     #   expect(delete: "/tags/1").to route_to("tags#destroy", id: "1")

@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   resources :sites, :only => [:index, :show]
   resources :tags, :except => [:destroy, :update]
-  resources :bokmarks
+  resources :bokmarks, :except => [:update]
   devise_for :users,
   controllers: {
     registrations: :registrations,

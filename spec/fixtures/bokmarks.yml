@@ -9,3 +9,14 @@ bokmark_root_user_a:
   bookmark_type: nil
   ancestry: nil 
   shorten_url: nil
+bokmark_root_user_b:
+  bookmark_type: "folder"
+  id: 2
+  title: "root for user b"
+  user_id: 2
+  site_id: nil
+  url_text: nil
+  photo_url: nil
+  bookmark_type: nil
+  ancestry: nil 
+  shorten_url: nil

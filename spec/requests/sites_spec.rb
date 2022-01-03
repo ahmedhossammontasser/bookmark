@@ -16,36 +16,70 @@ RSpec.describe "/sites", type: :request do
   # This should return the minimal set of attributes required to create a valid
   # Site. As you add validations to Site, be sure to
   # adjust the attributes here as well.
+  fixtures :users
+  fixtures :bokmarks
   let(:valid_attributes) {
-    skip("Add a hash of attributes valid for your model")
+    {
+      title: "facebook",
+      url: "https://www.facebook.com"
+    }
+  }
+  let(:bokmark_valid_attributes) {
+    {
+        "title": "ahmed hossam",
+        "url_text": "https://www.facebook.com/ahmedhossammontassera/",
+        "bookmark_type": "file",
+        "parent_id":   bokmarks[0].id , 
+        "tag_ids": [],
+        "user_id": users[0].id
+    }
   }
 
-  let(:invalid_attributes) {
-    skip("Add a hash of attributes invalid for your model")
-  }
+  # let(:invalid_attributes) {
+  #   skip("Add a hash of attributes invalid for your model")
+  # }
 
   # This should return the minimal set of values that should be in the headers
   # in order to pass any filters (e.g. authentication) defined in
   # SitesController, or in your router and rack
   # middleware. Be sure to keep this updated too.
-  let(:valid_headers) {
-    {}
-  }
+  # let(:valid_headers) {
+  #   {}
+  # }
+  def authenticated_header(user_id)
+		secret_key_base = ENV.fetch("SECRET_KEY_BASE") || Rails.application.secrets.secret_key_base
+		token = JWT.encode({id: user_id, exp: 60.days.from_now.to_i}, secret_key_base)
+    { 'Authorization': "token #{token}" }
+  end
 
-  describe "GET /index" do
+  describe "GET /index Empty" do
     it "renders a successful response" do
       Site.create! valid_attributes
-      get sites_url, headers: valid_headers, as: :json
+      get sites_url, headers: authenticated_header(users[0].id), as: :json
       expect(response).to be_successful
+      response_body = JSON.parse(response.body)
     end
   end
 
   describe "GET /show" do
-    it "renders a successful response" do
+    it "renders a AccessDenied response" do
       site = Site.create! valid_attributes
-      get site_url(site), as: :json
-      expect(response).to be_successful
+      expect{
+        get site_url(site), headers: authenticated_header(users[0].id), as: :json
+      }.to raise_error(CanCan::AccessDenied)
     end
   end
 
+  describe "GET /index " do
+    it "creates a new Bokmark" do
+      expect( users[0].sites.count ).to eq 0
+      post bokmarks_url,
+          params: { bokmark: bokmark_valid_attributes }, headers: authenticated_header(users[0].id), as: :json
+      get sites_url, headers: authenticated_header(users[0].id), as: :json
+      expect(response).to be_successful
+      response_body = JSON.parse(response.body)
+      expect( users[0].sites.count ).to eq 1
+    end
+  end
+  
 end

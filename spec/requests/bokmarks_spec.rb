@@ -31,14 +31,33 @@ RSpec.describe "/bokmarks", type: :request do
   let(:valid_attributes_2) {
     {
         "title": "ahmed hossam",
-        "url_text": "https://www.facebook.com/ahmed_hossam_montassera/",
+        "url_text": "https://www.facebook.com/a_hmed_hossam_montassera/",
         "bookmark_type": "file",
         "parent_id":   bokmarks[0].id , 
         "tag_ids": [],
         "user_id": users[0].id
     }
   }
-
+  let(:bokmark2_valid_attributes) {
+    {
+        "title": "ahmed hossam",
+        "url_text": "https://www.twitter.com/ahmedhossammontassera/",
+        "bookmark_type": "file",
+        "parent_id":   bokmarks[1].id , 
+        "tag_ids": [],
+        "user_id": users[1].id
+    }
+  }
+  let(:bokmark3_valid_attributes) {
+    {
+        "title": "ahmed hossam",
+        "url_text": "https://www.facebook.com/ahmed_hossam_montassera/",
+        "bookmark_type": "file",
+        "parent_id":   bokmarks[1].id , 
+        "tag_ids": [],
+        "user_id": users[1].id
+    }
+  }
   let(:invalid_attributes) {
     {
         "title": "ahmed hossam",
@@ -61,7 +80,6 @@ RSpec.describe "/bokmarks", type: :request do
   def authenticated_header(user_id)
 		secret_key_base = ENV.fetch("SECRET_KEY_BASE") || Rails.application.secrets.secret_key_base
 		token = JWT.encode({id: user_id, exp: 60.days.from_now.to_i}, secret_key_base)
-    # token = Knock::AuthToken.new(payload: { sub: user.id }).token
     { 'Authorization': "token #{token}" }
   end
 
@@ -175,4 +193,55 @@ RSpec.describe "/bokmarks", type: :request do
       }.to change(Bokmark, :count).by(-1)
     end
   end
+
+  describe "POST /index " do
+    it "Check sites count for multiple user" do
+      expect( users[0].site_ids.uniq.count ).to eq 0
+      expect( users[0].bokmarks.count ).to eq 1
+      expect( users[1].site_ids.uniq.count ).to eq 0
+      expect( users[1].bokmarks.count ).to eq 1
+
+      expect( Site.count ).to eq 0
+      expect( Bokmark.count ).to eq 2
+
+      post bokmarks_url,
+          params: { bokmark: valid_attributes }, headers: authenticated_header(users[0].id), as: :json
+      expect( users[0].reload.site_ids.uniq.count ).to eq 1
+      expect( users[0].reload.bokmarks.count ).to eq 2
+      expect( users[1].reload.site_ids.uniq.count ).to eq 0
+      expect( users[1].reload.bokmarks.count ).to eq 1
+      expect( Site.count ).to eq 1
+      expect( Bokmark.count ).to eq 3
+
+      post bokmarks_url,
+      params: { bokmark: bokmark2_valid_attributes }, headers: authenticated_header(users[1].id), as: :json
+      expect( users[0].reload.site_ids.uniq.count ).to eq 1
+      expect( users[0].reload.bokmarks.count ).to eq 2
+      expect( users[1].reload.site_ids.uniq.count ).to eq 1
+      expect( users[1].reload.bokmarks.count ).to eq 2
+      expect( Site.count ).to eq 2
+      expect( Bokmark.count ).to eq 4
+
+      post bokmarks_url,
+      params: { bokmark: bokmark3_valid_attributes }, headers: authenticated_header(users[1].id), as: :json
+      expect( users[0].reload.site_ids.uniq.count ).to eq 1
+      expect( users[0].reload.bokmarks.count ).to eq 2
+      expect( users[1].reload.site_ids.uniq.count ).to eq 2
+      expect( users[1].reload.bokmarks.count ).to eq 3
+      expect( Site.count ).to eq 2
+      expect( Bokmark.count ).to eq 5
+
+      
+      post bokmarks_url,
+      params: { bokmark: valid_attributes_2 }, headers: authenticated_header(users[0].id), as: :json
+      expect( users[0].reload.site_ids.uniq.count ).to eq 1
+      expect( users[0].reload.bokmarks.count ).to eq 3
+      expect( users[1].reload.site_ids.uniq.count ).to eq 2
+      expect( users[1].reload.bokmarks.count ).to eq 3
+      expect( Site.count ).to eq 2      
+      expect( Bokmark.count ).to eq 6
+
+    end
+  end
+
 end
